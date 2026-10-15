@@ -5,7 +5,8 @@ import { useEffect } from "react";
 
 export const CrispChat = () => {
 	useEffect(() => {
-		Crisp.configure(process.env.CRISP_WEBSITE_ID!);
+		const websiteId = process.env.NEXT_PUBLIC_CRISP_WEBSITE_ID;
+		if (websiteId) Crisp.configure(websiteId);
 	}, []);
 
 	return null;
