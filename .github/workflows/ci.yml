@@ -1,0 +1,41 @@
+name: CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    # Placeholder values so `next build` can load API routes that create
+    # clients at import time. No real credentials are needed in CI.
+    env:
+      OPENAI_API_KEY: sk-placeholder
+      REPLICATE_API_TOKEN: r8_placeholder
+      STRIPE_SECRET_KEY: sk_test_placeholder
+      DATABASE_URL: postgresql://user:pass@localhost:5432/db
+      NEXT_PUBLIC_APP_URL: http://localhost:3000
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Use Node.js 18
+      uses: actions/setup-node@v4
+      with:
+        node-version: 18.x
+        cache: npm
+
+    - name: Install
+      run: npm ci
+
+    - name: Lint
+      run: npm run lint
+
+    - name: Typecheck
+      run: npx tsc --noEmit
+
+    - name: Build
+      run: npm run build

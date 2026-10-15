@@ -42,10 +42,10 @@ The checkout creates a $20/month "Prometheus Pro" price on the fly, so you do no
    - **Local:** install the Stripe CLI and run `stripe listen --forward-to localhost:3000/api/webhook`; it prints a `whsec_...` value.
    - **Deployed:** **Developers → Webhooks → Add endpoint** with URL `https://YOUR_DOMAIN/api/webhook` and the events `checkout.session.completed` and `invoice.payment_succeeded`, then copy its signing secret.
 
-## 6. App URL and optional Crisp chat
+## 6. App URL and Crisp chat
 
 - `NEXT_PUBLIC_APP_URL`: `http://localhost:3000` locally, your real domain (no trailing slash) when deployed.
-- `NEXT_PUBLIC_CRISP_WEBSITE_ID` (optional): from https://app.crisp.chat → **Settings → Website settings**. Leave it empty to turn the chat widget off.
+- `NEXT_PUBLIC_CRISP_WEBSITE_ID`: the support chat widget. Create a free account at https://app.crisp.chat and copy the Website ID from **Settings → Website settings**.
 
 ## Run and deploy
 
