@@ -57,7 +57,7 @@ yarn install
 
 3. **Configure environment variables**:
 
-To ensure proper functionality, set up environment variables for API keys and other sensitive information. Create a `.env` file in the root directory and populate it with the necessary variables. For reference, consult the `.env.example` file for the required variables.
+To ensure proper functionality, set up environment variables for API keys and other sensitive information. Create a `.env` file in the root directory and populate it with the necessary variables. For reference, consult the `.env.example` file for the required variables, and [SETUP.md](SETUP.md) for where to get each one.
 
 4. **Run the application**:
 
