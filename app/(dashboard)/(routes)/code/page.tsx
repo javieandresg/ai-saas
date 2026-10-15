@@ -4,7 +4,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
 import { Code } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { ChatCompletionRequestMessage } from "openai";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import ReactMarkdown from "react-markdown";
@@ -19,6 +18,7 @@ import { Form, FormControl, FormField, FormItem } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { UserAvatar } from "@/components/user-avatar";
 import { cn } from "@/lib/utils";
+import type { ChatMessage } from "@/types";
 
 import useProModal from "@/hooks/use-pro-modal";
 import { toast } from "react-hot-toast";
@@ -27,7 +27,7 @@ import { formSchema } from "./constants";
 const CodePage = () => {
   const router = useRouter();
   const proModal = useProModal();
-  const [messages, setMessages] = useState<ChatCompletionRequestMessage[]>([]);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -41,7 +41,7 @@ const CodePage = () => {
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     console.log(values);
     try {
-      const userMessage: ChatCompletionRequestMessage = {
+      const userMessage: ChatMessage = {
         role: "user",
         content: values.prompt,
       };

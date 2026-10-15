@@ -32,7 +32,7 @@ const ImagePage = () => {
     defaultValues: {
       prompt: "",
       amount: "1",
-      resolution: "512x512",
+      resolution: "1024x1024",
     },
   });
 
@@ -155,9 +155,11 @@ const ImagePage = () => {
                   <Image src={image} fill alt="image" />
                 </div>
                 <CardFooter className="p-2">
-                  <Button onClick={() => window.open(image)} variant="secondary" className="w-full">
-                    <Download className="h-4 w-4" />
-                    Download
+                  <Button asChild variant="secondary" className="w-full">
+                    <a href={image} download={`image-${index + 1}.webp`}>
+                      <Download className="h-4 w-4" />
+                      Download
+                    </a>
                   </Button>
                 </CardFooter>
               </Card>

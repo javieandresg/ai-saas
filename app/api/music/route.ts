@@ -6,6 +6,7 @@ import Replicate from "replicate";
 
 const replicate = new Replicate({
   auth: process.env.REPLICATE_API_TOKEN!,
+  useFileOutput: false,
 });
 
 export async function POST(req: Request) {
@@ -29,9 +30,9 @@ export async function POST(req: Request) {
       return new NextResponse("API Limit Exceeded", { status: 403 });
     }
 
-    const response = await replicate.run("riffusion/riffusion:8cf61ea6c56afd61d8f5b9ffd14d7c216c0a93844ce2d82ac1c9ecc9c7f24e05", {
+    const audio = await replicate.run("google/lyria-3", {
       input: {
-        prompt_a: prompt,
+        prompt,
       },
     });
 
@@ -39,7 +40,7 @@ export async function POST(req: Request) {
       await increaseApiLimit();
     }
 
-    return NextResponse.json(response, { status: 200 });
+    return NextResponse.json({ audio }, { status: 200 });
   } catch (error) {
     console.log("[MUSIC_ERROR]", error);
     return new NextResponse("Internal Server Error", { status: 500 });

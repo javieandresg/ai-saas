@@ -1,16 +1,11 @@
 import { checkApiLimit, increaseApiLimit } from "@/lib/api-limit";
+import { CHAT_MODEL, getOpenAI } from "@/lib/openai";
 import { checkSubscription } from "@/lib/subscription";
 import { auth } from "@clerk/nextjs";
 import { NextResponse } from "next/server";
-import { ChatCompletionRequestMessage, Configuration, OpenAIApi } from "openai";
+import type { ChatCompletionMessageParam } from "openai/resources/chat/completions";
 
-const configuration = new Configuration({
-  apiKey: process.env.OPENAI_API_KEY,
-});
-
-const openAi = new OpenAIApi(configuration);
-
-const instructionMessage: ChatCompletionRequestMessage = {
+const instructionMessage: ChatCompletionMessageParam = {
   role: "system",
   content: "You are a code generator. You must answer only in markdown code snippets. Use code comments for explanations.",
 };
@@ -25,7 +20,7 @@ export async function POST(req: Request) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
-    if (!configuration) {
+    if (!process.env.OPENAI_API_KEY) {
       return new NextResponse("OpenAI API Key not configured", { status: 500 });
     }
 
@@ -40,8 +35,8 @@ export async function POST(req: Request) {
       return new NextResponse("API Limit Exceeded", { status: 403 });
     }
 
-    const response = await openAi.createChatCompletion({
-      model: "gpt-3.5-turbo",
+    const response = await getOpenAI().chat.completions.create({
+      model: CHAT_MODEL,
       messages: [instructionMessage, ...messages],
     });
 
@@ -49,7 +44,7 @@ export async function POST(req: Request) {
       await increaseApiLimit();
     }
 
-    return NextResponse.json(response.data.choices[0].message, { status: 200 });
+    return NextResponse.json(response.choices[0].message, { status: 200 });
   } catch (error) {
     console.log("[CODE_ERROR]", error);
     return new NextResponse("Internal Server Error", { status: 500 });

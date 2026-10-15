@@ -1,26 +1,20 @@
 import { checkApiLimit, increaseApiLimit } from "@/lib/api-limit";
+import { getOpenAI, IMAGE_MODEL } from "@/lib/openai";
 import { checkSubscription } from "@/lib/subscription";
 import { auth } from "@clerk/nextjs";
 import { NextResponse } from "next/server";
-import { Configuration, OpenAIApi } from "openai";
-
-const configuration = new Configuration({
-  apiKey: process.env.OPENAI_API_KEY,
-});
-
-const openAi = new OpenAIApi(configuration);
 
 export async function POST(req: Request) {
   try {
     const { userId } = auth();
     const body = await req.json();
-    const { prompt, amount = 1, resolution = "512x512" } = body;
+    const { prompt, amount = 1, resolution = "1024x1024" } = body;
 
     if (!userId) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
-    if (!configuration) {
+    if (!process.env.OPENAI_API_KEY) {
       return new NextResponse("OpenAI API Key not configured", { status: 500 });
     }
 
@@ -43,19 +37,26 @@ export async function POST(req: Request) {
       return new NextResponse("API Limit Exceeded", { status: 403 });
     }
 
-    const response = await openAi.createImage({
+    const response = await getOpenAI().images.generate({
+      model: IMAGE_MODEL,
       prompt,
       n: parseInt(amount, 10),
       size: resolution,
+      output_format: "webp",
     });
+
+    // GPT image models return base64 only; send data URLs so the client keeps reading `url`.
+    const images = (response.data ?? []).map((image) => ({
+      url: `data:image/webp;base64,${image.b64_json}`,
+    }));
 
     if (!isPro) {
       await increaseApiLimit();
     }
 
-    return NextResponse.json(response.data.data, { status: 200 });
+    return NextResponse.json(images, { status: 200 });
   } catch (error) {
-    console.log("[CONVERSATION_ERROR]", error);
+    console.log("[IMAGE_ERROR]", error);
     return new NextResponse("Internal Server Error", { status: 500 });
   }
 }
